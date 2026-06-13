@@ -16,8 +16,8 @@
 // ── Sub-scene timeline (milliseconds) ────────────────────────
 static const float T_BFILL = 1500.0f;
 static const float T_FLOOD = 18000.0f;
-static const float T_SCAN  = 34000.0f;
-static const float T_DONE  = 48000.0f;   // coloured house stays after this
+static const float T_SCAN  = 27000.0f;   // flood phase ends soon after it fills
+static const float T_DONE  = 41000.0f;   // coloured house stays after this
 
 // ── Grid helpers (one logical pixel = 'cell' screen pixels) ──
 static void gridLines(float gx, float gy, int cols, int rows, float cell) {
@@ -239,7 +239,7 @@ void scene2(float t) {
         int si = 11, sj = 8;
         std::vector<int> order = bfsFill(cols, rows, isOld, si, sj);
 
-        int shown = (int)(lt / 18.0f);
+        int shown = (int)(lt / 1000.0f);   // slow: one BFS ring per ~1s
         for (int j = 0; j < rows; j++)
             for (int i = 0; i < cols; i++) {
                 int o = order[j * cols + i];
