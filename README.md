@@ -48,8 +48,17 @@ sudo apt-get install freeglut3-dev
 brew install freeglut
 ```
 
-**Windows (MinGW):**
-Download freeglut from https://www.transmissionzero.co.uk/software/freeglut-devel/
+**Windows (MSYS2 + MinGW-w64 — recommended):**
+1. Install MSYS2 from https://www.msys2.org
+2. Open the **MSYS2 MinGW64** shell and run:
+   ```bash
+   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-freeglut make
+   ```
+3. `cd` to this project folder and run `make`, then `./cg_project`.
+
+The Makefile auto-detects MSYS2/MinGW and links `-lfreeglut -lopengl32 -lglu32`.
+(Alternative: download freeglut from
+https://www.transmissionzero.co.uk/software/freeglut-devel/ for plain MinGW.)
 
 ### Build
 ```bash
@@ -125,8 +134,8 @@ drawLabel(200, 300, "angle = 45 deg");   // small yellow label
 
 ## Concepts checklist
 
-- [ ] Member 1: Points, Lines (Bresenham), Circles (Midpoint), Polygons, OpenGL Setup
-- [ ] Member 2: Boundary Fill, Flood Fill, Scan-Line Fill
-- [ ] Member 3: Translation, Rotation, Scaling, Reflection, Shearing
-- [ ] Member 4: Window/Viewport, W-to-V Mapping, Cohen-Sutherland, Liang-Barsky
-- [ ] Member 5: 3D Transforms, Projection (Ortho + Perspective), Z-Buffer, Animation
+- [x] Member 1: Points, Lines (Bresenham), Circles (Midpoint), Polygons, OpenGL Setup
+- [x] Member 2: Boundary Fill, Flood Fill, Scan-Line Fill
+- [x] Member 3: Translation, Rotation, Scaling, Reflection, Shearing
+- [x] Member 4: Window/Viewport, W-to-V Mapping, Cohen-Sutherland, Liang-Barsky
+- [x] Member 5: 3D Transforms, Projection (Ortho + Perspective), Z-Buffer, Animation

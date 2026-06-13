@@ -64,6 +64,12 @@ void display() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    // 2D scenes draw in painter's order (later draws on top). Depth
+    // testing would reject equal-Z fragments (outlines over fills,
+    // text over shapes), so disable it here. Scene 5 re-enables it
+    // locally for its 3D content and disables it again before returning.
+    glDisable(GL_DEPTH_TEST);
+
     // Draw the scene label bottom-left (always visible)
     const char* sceneNames[] = {
         "INTRO",
@@ -110,9 +116,14 @@ int main(int argc, char** argv) {
     glutCreateWindow(WIN_TITLE);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LINE_SMOOTH);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Anti-aliasing for smoother lines and round points.
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_POINT_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);

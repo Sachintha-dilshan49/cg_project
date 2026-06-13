@@ -13,6 +13,12 @@ UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
     # macOS
     GL_FLAGS = -framework OpenGL -framework GLUT
+else ifneq (,$(findstring MINGW,$(UNAME)))
+    # Windows (MSYS2 / MinGW-w64 with freeglut)
+    GL_FLAGS = -lfreeglut -lopengl32 -lglu32
+else ifneq (,$(findstring MSYS,$(UNAME)))
+    # Windows (MSYS2 shell)
+    GL_FLAGS = -lfreeglut -lopengl32 -lglu32
 else
     # Linux
     GL_FLAGS = -lGL -lGLU -lglut
