@@ -62,45 +62,6 @@ make run
 
 ---
 
-## How to implement your scene
-
-Open your `scenes/sceneX.cpp`. Your function signature is:
-
-```cpp
-void sceneX(float t) {
-    // t = milliseconds since this scene started
-}
-```
-
-Use `t` to animate over time:
-
-```cpp
-void scene3(float t) {
-    // Sub-scene A: first 5 seconds
-    if (t < 5000) {
-        float angle = t * 0.05f;   // grows over time
-        // draw rotation demo...
-    }
-    // Sub-scene B: 5 to 10 seconds
-    else if (t < 10000) {
-        // draw scaling demo...
-    }
-}
-```
-
-Draw Prof. Pixel anywhere in your scene:
-```cpp
-drawProfPixel(120, 120, 0.9f, false, 0.8f);
-//            x    y   scale  wave  mouthOpen
-```
-
-Draw text:
-```cpp
-drawHeading(20, 550, "My Scene Title");   // large white text
-drawLabel(200, 300, "angle = 45 deg");   // small yellow label
-```
-
----
 
 
 ## Concepts checklist
