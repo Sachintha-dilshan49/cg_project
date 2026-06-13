@@ -1,0 +1,14 @@
+# Compiled output
+cg_project
+*.o
+*.exe
+*.out
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
