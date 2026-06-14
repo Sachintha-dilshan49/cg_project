@@ -6,7 +6,7 @@
 # ============================================================
 
 CXX      = g++
-CXXFLAGS = -std=c++11 -Wall -O2
+CXXFLAGS = -std=c++11 -Wall -O2 -DGL_SILENCE_DEPRECATION
 
 # Detect OS and set OpenGL flags
 UNAME := $(shell uname)
