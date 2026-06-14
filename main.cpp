@@ -10,14 +10,16 @@
 // ── Global state (declared extern in common.h) ───────────────
 float animTime    = 0.0f;
 int   currentScene = SCENE_INTRO;
+bool  paused      = false;   // freeze the animation in place when true
 
 // ── Timer callback ───────────────────────────────────────────
 // Called every TIMER_MS milliseconds. Advances animTime and
-// triggers a redraw. Do NOT modify.
+// triggers a redraw. While paused, animTime is held so every scene
+// freezes exactly where it is (the loop keeps redrawing).
 #define TIMER_MS 16   // ~60 fps
 
 void timerCallback(int) {
-    animTime += TIMER_MS;
+    if (!paused) animTime += TIMER_MS;
     glutPostRedisplay();
     glutTimerFunc(TIMER_MS, timerCallback, 0);
 }
@@ -25,13 +27,14 @@ void timerCallback(int) {
 // ── Scene switcher ───────────────────────────────────────────
 void switchScene(int scene) {
     currentScene = scene;
+    paused = false;          // always resume when jumping to a scene
     resetTimer();
     glutPostRedisplay();
 }
 
 // ── Keyboard controls ────────────────────────────────────────
 // 0 = Intro, 1-5 = scenes, 6 = Outro
-// SPACE = next scene, ESC = quit
+// SPACE = next scene, P = pause/resume, ESC = quit
 void keyboardCallback(unsigned char key, int, int) {
     switch (key) {
         case '0': switchScene(SCENE_INTRO);  break;
@@ -45,6 +48,10 @@ void keyboardCallback(unsigned char key, int, int) {
             // Auto-advance to next scene
             if (currentScene < SCENE_OUTRO)
                 switchScene(currentScene + 1);
+            break;
+        case 'p': case 'P':
+            paused = !paused;    // pause / resume the animation anywhere
+            glutPostRedisplay();
             break;
         case 27: // ESC
             exit(0);
@@ -81,7 +88,7 @@ void display() {
         "OUTRO"
     };
     drawText(10, 10, sceneNames[currentScene], COL_DARK_GREY, false);
-    drawText(10, 25, "SPACE = next scene  |  0-6 = jump to scene  |  ESC = quit",
+    drawText(10, 25, "SPACE = next  |  0-6 = jump  |  P = pause/resume  |  ESC = quit",
              COL_DARK_GREY, false);
 
     // Route to the correct scene function
@@ -93,6 +100,16 @@ void display() {
         case SCENE_4:      scene4(animTime);       break;
         case SCENE_5:      scene5(animTime);       break;
         case SCENE_OUTRO:  sceneOutro(animTime);   break;
+    }
+
+    // "PAUSED" indicator, drawn on top of whatever the scene rendered.
+    if (paused) {
+        glDisable(GL_DEPTH_TEST);            // scene 5 may have left it on
+        glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+        glMatrixMode(GL_PROJECTION); glLoadIdentity();
+        glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
+        glMatrixMode(GL_MODELVIEW);  glLoadIdentity();
+        drawText(WIN_WIDTH/2 - 45, WIN_HEIGHT - 22, "|| PAUSED", COL_YELLOW, true);
     }
 
     glutSwapBuffers();

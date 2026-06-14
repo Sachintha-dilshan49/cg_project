@@ -82,11 +82,25 @@ static void s5_badge(float x,float y,float w,float h,Color border){
     glLineWidth(1.f);
 }
 
+// ── Map a logical (800x600) rectangle to the ACTUAL window ────
+// Lets the 3D panels fill the window correctly when it is resized
+// or maximised, and reports the true pixel aspect ratio so the 3D
+// projection does not stretch.
+static void s5_setViewport(int lx, int ly, int lw, int lh, float* outAspect)
+{
+    int W = glutGet(GLUT_WINDOW_WIDTH);
+    int H = glutGet(GLUT_WINDOW_HEIGHT);
+    int px = lx * W / WIN_WIDTH,  py = ly * H / WIN_HEIGHT;
+    int pw = lw * W / WIN_WIDTH,  ph = lh * H / WIN_HEIGHT;
+    glViewport(px, py, pw, ph);
+    if (outAspect) *outAspect = (ph > 0) ? (float)pw / (float)ph : 1.0f;
+}
+
 // ── begin3D: set viewport + projection for RIGHT panel ────────
 static void begin3D_right(bool perspective)
 {
-    glViewport(V3X, V3Y, V3W, V3H);
-    float aspect = (float)V3W / (float)V3H;
+    float aspect;
+    s5_setViewport(V3X, V3Y, V3W, V3H, &aspect);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     if(perspective){
@@ -105,8 +119,8 @@ static void begin3D_right(bool perspective)
 // begin3D with custom viewport (for split-panel demos)
 static void begin3D_vp(int vx,int vy,int vw,int vh,bool perspective)
 {
-    glViewport(vx,vy,vw,vh);
-    float aspect=(float)vw/(float)vh;
+    float aspect;
+    s5_setViewport(vx,vy,vw,vh,&aspect);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     if(perspective){
@@ -126,7 +140,7 @@ static void begin3D_vp(int vx,int vy,int vw,int vh,bool perspective)
 static void restore2D_s5()
 {
     glDisable(GL_DEPTH_TEST);
-    glViewport(0,0,WIN_WIDTH,WIN_HEIGHT);
+    glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0,WIN_WIDTH,0,WIN_HEIGHT);
@@ -424,8 +438,9 @@ void scene5(float t)
         s5_dashedRect(CX0,CY0,CX1,CY1,COL_SCENE5,1.5f);
 
         // Section label
-        drawLabel(CX0+10, H-85,
-            "1. 3D TRANSFORMATIONS  -  rotate around X / Y / Z axes");
+        drawText(30, H-95,
+            "1. 3D TRANSFORMATIONS  -  rotate around X / Y / Z axes",
+            COL_YELLOW, true);
 
         // Axis name badge
         const char* axName[]={"Rotate X  -  tilts forward / back",
@@ -449,8 +464,8 @@ void scene5(float t)
 
         // Bottom explanation
         drawText(CX0+10, CY0+10,
-            "4x4 homogeneous matrix: T*R*S applied right-to-left per vertex.",
-            COL_LIGHT_GREY, false);
+            "4x4 matrix: T*R*S applied per vertex (right-to-left).",
+            COL_WHITE, true);
     }
 
     // =========================================================
@@ -488,8 +503,9 @@ void scene5(float t)
         restore2D_s5();
 
         s5_dashedRect(CX0,CY0,CX1,CY1,COL_SCENE5,1.5f);
-        drawLabel(CX0+10, H-85,
-            "2. PROJECTION  -  orthographic (left) vs perspective (right)");
+        drawText(30, H-95,
+            "2. PROJECTION  -  orthographic (left) vs perspective (right)",
+            COL_YELLOW, true);
 
         // Divider between the two halves
         float divX = CX0 + (CX1-CX0)*0.5f;
@@ -503,12 +519,12 @@ void scene5(float t)
         drawText(divX+18, CY1-40, "PERSPECTIVE", COL_SCENE5, false);
 
         // Bottom explanation
-        drawText(CX0+10, CY0+24,
-            "Ortho: parallel lines stay parallel. No vanishing point.",
-            COL_LIGHT_GREY, false);
-        drawText(CX0+10, CY0+8,
-            "Perspective: far objects shrink. Converges to vanishing point.",
-            COL_LIGHT_GREY, false);
+        drawText(CX0+10, CY0+36,
+            "Ortho: parallel lines stay parallel.",
+            COL_WHITE, true);
+        drawText(CX0+10, CY0+10,
+            "Perspective: far objects shrink to a vanishing point.",
+            COL_WHITE, true);
     }
 
     // =========================================================
@@ -551,8 +567,9 @@ void scene5(float t)
         restore2D_s5();
 
         s5_dashedRect(CX0,CY0,CX1,CY1,COL_SCENE5,1.5f);
-        drawLabel(CX0+10, H-85,
-            "3. Z-BUFFER  -  depth testing: which surface is actually in front?");
+        drawText(30, H-95,
+            "3. Z-BUFFER  -  which surface is actually in front?",
+            COL_YELLOW, true);
 
         float divX = CX0 + (CX1-CX0)*0.5f;
         s5_solidLine(divX, CY0+40, divX, CY1-10, COL_DARK_GREY, 2.f);
@@ -566,12 +583,12 @@ void scene5(float t)
         s5_badge(divX+10, CY1-52, 180, 26, {grn[0],grn[1],grn[2]});
         drawText(divX+18, CY1-40, "Z-BUFFER ON", {grn[0],grn[1],grn[2]}, false);
 
-        drawText(CX0+10, CY0+24,
+        drawText(CX0+10, CY0+36,
             "Left: draw order decides overlap (wrong).",
-            {red[0],red[1],red[2]}, false);
-        drawText(CX0+10, CY0+8,
-            "Right: GPU compares depth per pixel -- closest wins (correct).",
-            {grn[0],grn[1],grn[2]}, false);
+            {red[0],red[1],red[2]}, true);
+        drawText(CX0+10, CY0+10,
+            "Right: closest surface wins per pixel (correct).",
+            {grn[0],grn[1],grn[2]}, true);
     }
 
     // =========================================================
@@ -625,8 +642,9 @@ void scene5(float t)
         restore2D_s5();
 
         s5_dashedRect(CX0,CY0,CX1,CY1,COL_SCENE5,1.5f);
-        drawLabel(CX0+10, H-85,
-            "4. ANIMATION  -  orbiting camera, door opens, car drives");
+        drawText(30, H-95,
+            "4. ANIMATION  -  camera orbits, door opens, car drives",
+            COL_YELLOW, true);
 
         // Render pipeline stage ticker (bottom strip)
         const char* steps[]={"Clear","Transform","Project","Clip","Z-test","Display"};
@@ -663,7 +681,7 @@ void scene5(float t)
     glDisable(GL_DEPTH_TEST);
     glMatrixMode(GL_PROJECTION); glPopMatrix();
     glMatrixMode(GL_MODELVIEW);  glPopMatrix();
-    glViewport(0,0,W,H);
+    glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
     glLineWidth(1.f);
     glPointSize(1.f);
     glColor3f(1,1,1);

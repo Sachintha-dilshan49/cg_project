@@ -174,14 +174,16 @@ void scene4(float t) {
         drawText(458, (wy0 + wy1) / 2 + 8, "maps to", COL_WHITE, false);
 
         if (t < T_MAP) {
-            drawLabel(250, WIN_HEIGHT - 85,
-                      "1. WINDOW vs VIEWPORT  -  what we see (world) vs where it appears (screen)");
-            drawText(250, 150,
-                     "The window selects a region of the world; the viewport is the screen area it fills.",
-                     COL_WHITE, false);
+            drawText(30, WIN_HEIGHT - 95,
+                     "1. WINDOW vs VIEWPORT  -  world space vs screen space",
+                     COL_YELLOW, true);
+            drawText(180, 150,
+                     "Window = what we see.  Viewport = where it appears.",
+                     COL_WHITE, true);
         } else {
-            drawLabel(250, WIN_HEIGHT - 85,
-                      "2. WINDOW-TO-VIEWPORT MAPPING  -  every point maps across by simple proportion");
+            drawText(30, WIN_HEIGHT - 95,
+                     "2. WINDOW-TO-VIEWPORT MAPPING  -  map every point by proportion",
+                     COL_YELLOW, true);
 
             float p = 0.5f * (1 + sin((t - T_MAP) * 0.0011f));
             float q = 0.5f * (1 + cos((t - T_MAP) * 0.0009f));
@@ -193,10 +195,10 @@ void scene4(float t) {
             dot(pwx, pwy, COL_YELLOW, 11.0f);
             dot(pvx, pvy, COL_YELLOW, 11.0f);
 
-            drawText(250, 150,
-                     "sx = vx0 + (wx - wx0) * (vx1 - vx0) / (wx1 - wx0)", COL_WHITE, false);
-            drawText(250, 130,
-                     "sy = vy0 + (wy - wy0) * (vy1 - vy0) / (wy1 - wy0)", COL_WHITE, false);
+            drawText(180, 150,
+                     "sx = vx0 + (wx - wx0) * (vx1 - vx0) / (wx1 - wx0)", COL_WHITE, true);
+            drawText(180, 124,
+                     "sy = vy0 + (wy - wy0) * (vy1 - vy0) / (wy1 - wy0)", COL_WHITE, true);
         }
     }
 
@@ -204,8 +206,9 @@ void scene4(float t) {
     //  3. COHEN-SUTHERLAND  -  one clear example at a time
     // ===========================================================
     else if (t < T_LB) {
-        drawLabel(250, WIN_HEIGHT - 85,
-                  "3. COHEN-SUTHERLAND  -  give each endpoint a 4-bit region code");
+        drawText(30, WIN_HEIGHT - 95,
+                 "3. COHEN-SUTHERLAND  -  give each endpoint a 4-bit region code",
+                 COL_YELLOW, true);
         drawRegionGrid();
 
         // Cycle through the three cases so the screen is never cluttered.
@@ -241,21 +244,19 @@ void scene4(float t) {
         if (cohenSutherland(cx0, cy0, cx1, cy1, WXMIN, WYMIN, WXMAX, WYMAX))
             solidLine(cx0, cy0, cx1, cy1, COL_YELLOW, 4.0f);
 
-        drawText(250, 150, verdict, vcol, true);
-        drawText(250, 125,
-                 "Code bits: TOP BOTTOM RIGHT LEFT.  0000 means inside.",
-                 COL_WHITE, false);
-        drawText(250, 105,
-                 "Both 0 -> accept.   Bitwise AND != 0 -> reject.   Otherwise clip.",
-                 COL_LIGHT_GREY, false);
+        drawText(180, 108, verdict, vcol, true);
+        drawText(180, 82,
+                 "Both 0 = accept.  AND != 0 = reject.  Else clip.",
+                 COL_WHITE, true);
     }
 
     // ===========================================================
     //  4. LIANG-BARSKY
     // ===========================================================
     else if (t < T_SCENE) {
-        drawLabel(250, WIN_HEIGHT - 85,
-                  "4. LIANG-BARSKY  -  parametric clip: find t_enter and t_leave");
+        drawText(30, WIN_HEIGHT - 95,
+                 "4. LIANG-BARSKY  -  parametric clip: find t_enter and t_leave",
+                 COL_YELLOW, true);
         dashedRect(WXMIN, WYMIN, WXMAX, WYMAX, COL_SCENE4, 2.5f);
 
         float lt = t - T_LB;
@@ -278,22 +279,23 @@ void scene4(float t) {
 
             char buf[64];
             snprintf(buf, sizeof(buf), "t_enter = %.2f      t_leave = %.2f", u1, u2);
-            drawText(250, 150, buf, COL_WHITE, true);
+            drawText(180, 150, buf, COL_WHITE, true);
         }
-        drawText(250, 125,
-                 "Walk the line as t goes 0 -> 1; keep only the t range inside the window.",
-                 COL_WHITE, false);
-        drawText(250, 105,
+        drawText(180, 124,
+                 "Keep only the t-range of the line inside the window.",
+                 COL_WHITE, true);
+        drawText(180, 100,
                  "Fewer calculations than Cohen-Sutherland, same result.",
-                 COL_LIGHT_GREY, false);
+                 COL_LIGHT_GREY, true);
     }
 
     // ===========================================================
     //  5. ADVANCED  -  clip a WHOLE house+tree scene to the window
     // ===========================================================
     else {
-        drawLabel(250, WIN_HEIGHT - 85,
-                  "CLIPPING A WHOLE SCENE  -  only what is inside the window survives");
+        drawText(30, WIN_HEIGHT - 95,
+                 "CLIPPING A WHOLE SCENE  -  only what is inside survives",
+                 COL_YELLOW, true);
         dashedRect(WXMIN, WYMIN, WXMAX, WYMAX, COL_SCENE4, 2.5f);
 
         // Each row is one line segment {x0,y0,x1,y1}. Parts of the house
@@ -322,10 +324,10 @@ void scene4(float t) {
                 solidLine(cx0, cy0, cx1, cy1, COL_SCENE2, 3.0f);
         }
 
-        drawText(250, 150,
-                 "Every edge is clipped with Cohen-Sutherland (green = kept, grey = removed).",
-                 COL_WHITE, false);
-        drawText(250, 128, "The real world has depth, though...", COL_YELLOW, false);
+        drawText(180, 150,
+                 "Every edge clipped:  green = kept,  grey = removed.",
+                 COL_WHITE, true);
+        drawText(180, 124, "The real world has depth, though...", COL_YELLOW, true);
     }
 
     if (t > T_SCENE + 4000.0f) {

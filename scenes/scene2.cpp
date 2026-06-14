@@ -15,9 +15,9 @@
 
 // ── Sub-scene timeline (milliseconds) ────────────────────────
 static const float T_BFILL = 1500.0f;
-static const float T_FLOOD = 18000.0f;
-static const float T_SCAN  = 27000.0f;   // flood phase ends soon after it fills
-static const float T_DONE  = 41000.0f;   // coloured house stays after this
+static const float T_FLOOD = 10000.0f;   // flood starts ~2s after boundary fills
+static const float T_SCAN  = 19000.0f;   // flood phase ends soon after it fills
+static const float T_DONE  = 33000.0f;   // coloured house stays after this
 
 // ── Grid helpers (one logical pixel = 'cell' screen pixels) ──
 static void gridLines(float gx, float gy, int cols, int rows, float cell) {
@@ -168,8 +168,9 @@ void scene2(float t) {
     // ===========================================================
     if (t < T_FLOOD) {
         float lt = t - T_BFILL;
-        drawLabel(300, WIN_HEIGHT - 100,
-                  "1. BOUNDARY FILL  -  spread from a seed, stop at the boundary");
+        drawText(30, WIN_HEIGHT - 100,
+                 "1. BOUNDARY FILL  -  spread from a seed, stop at the boundary",
+                 COL_YELLOW, true);
 
         int cols = 22, rows = 16; float cell = 18, gx = 300, gy = 150;
         gridLines(gx, gy, cols, rows, cell);
@@ -191,7 +192,7 @@ void scene2(float t) {
         int si = 10, sj = 7;            // seed inside the wall
         std::vector<int> order = bfsFill(cols, rows, fillable, si, sj);
 
-        int shown = (int)(lt / 95.0f);  // reveal speed (slow, easy to follow)
+        int shown = (int)(lt / 500.0f);  // reveal speed (slow, easy to follow)
         for (int j = 0; j < rows; j++)
             for (int i = 0; i < cols; i++) {
                 int o = order[j * cols + i];
@@ -200,9 +201,9 @@ void scene2(float t) {
         // Seed marker.
         fillCell(gx, gy, si, sj, cell, COL_YELLOW);
 
-        drawText(300, gy - 26,
-                 "Fill every neighbour until the boundary colour is reached.",
-                 COL_WHITE, false);
+        drawText(180, 120,
+                 "Spreads from the seed, stopping at the boundary colour.",
+                 COL_WHITE, true);
     }
 
     // ===========================================================
@@ -210,8 +211,9 @@ void scene2(float t) {
     // ===========================================================
     else if (t < T_SCAN) {
         float lt = t - T_FLOOD;
-        drawLabel(300, WIN_HEIGHT - 100,
-                  "2. FLOOD FILL  -  replace every pixel matching the seed's colour");
+        drawText(30, WIN_HEIGHT - 100,
+                 "2. FLOOD FILL  -  replace every pixel matching the seed's colour",
+                 COL_YELLOW, true);
 
         int cols = 22, rows = 16; float cell = 18, gx = 300, gy = 150;
         gridLines(gx, gy, cols, rows, cell);
@@ -247,12 +249,12 @@ void scene2(float t) {
             }
         fillCell(gx, gy, si, sj, cell, COL_YELLOW);
 
-        drawText(300, gy - 26,
-                 "Like the paint-bucket: only the matching colour is replaced.",
-                 COL_WHITE, false);
-        drawText(300, gy - 44,
-                 "(The orange patch is a different colour, so it is untouched.)",
-                 COL_LIGHT_GREY, false);
+        drawText(180, 120,
+                 "Paint-bucket: only the matching colour is replaced.",
+                 COL_WHITE, true);
+        drawText(180, 96,
+                 "The orange patch is a different colour, so it stays.",
+                 COL_LIGHT_GREY, true);
     }
 
     // ===========================================================
@@ -260,8 +262,9 @@ void scene2(float t) {
     // ===========================================================
     else if (t < T_DONE) {
         float lt = t - T_SCAN;
-        drawLabel(300, WIN_HEIGHT - 100,
-                  "3. SCAN-LINE FILL  -  sweep rows, fill between edge crossings");
+        drawText(30, WIN_HEIGHT - 100,
+                 "3. SCAN-LINE FILL  -  sweep rows, fill between edge crossings",
+                 COL_YELLOW, true);
 
         // A pentagon to fill.
         const int n = 5;
@@ -291,19 +294,20 @@ void scene2(float t) {
         glEnd();
         drawText(595, sweepY - 4, "scan line", COL_YELLOW, false);
 
-        drawText(300, yBot - 26,
+        drawText(180, 120,
                  "No recursion - this is how GPUs fill triangles today.",
-                 COL_WHITE, false);
+                 COL_WHITE, true);
     }
 
     // ===========================================================
     //  FINAL - FULLY COLOURED HOUSE (stays)
     // ===========================================================
     else {
-        drawLabel(330, WIN_HEIGHT - 100, "The house is fully coloured!");
+        drawText(30, WIN_HEIGHT - 100, "The house is fully coloured!",
+                 COL_YELLOW, true);
         drawColoredHouse(440, 230, 80);
-        drawText(330, 150, "Beautiful! But what if I want to move it?",
-                 COL_YELLOW, false);
+        drawText(180, 120, "Beautiful! But what if I want to move it?",
+                 COL_YELLOW, true);
     }
 
     if (t > T_DONE + 3000.0f) {

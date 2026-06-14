@@ -154,8 +154,9 @@ void scene1(float t) {
     //  PHASE 1 - POINTS
     // ===========================================================
     if (t < T_LINE) {
-        drawLabel(250, WIN_HEIGHT - 85,
-                  "1. POINTS  -  a pixel at an (x, y) location; glPointSize sets its size");
+        drawText(30, WIN_HEIGHT - 95,
+                 "1. POINTS  -  a pixel at an (x, y) location; glPointSize sets its size",
+                 COL_YELLOW, true);
 
         float baseY = 300.0f, startX = 320.0f;
         int   nPts  = 6;
@@ -176,9 +177,9 @@ void scene1(float t) {
         }
         glPointSize(1.0f);
 
-        drawText(250, 230,
-                 "Everything starts with a single point - the smallest thing we can draw.",
-                 COL_WHITE, false);
+        drawText(180, 235,
+                 "Everything starts with a single point.",
+                 COL_WHITE, true);
     }
 
     // ===========================================================
@@ -186,8 +187,9 @@ void scene1(float t) {
     // ===========================================================
     else if (t < T_CIRCLE) {
         float lt = t - T_LINE;
-        drawLabel(250, WIN_HEIGHT - 85,
-                  "2. LINES  -  Bresenham's Algorithm: integer math picks the nearest pixel");
+        drawText(30, WIN_HEIGHT - 95,
+                 "2. LINES  -  Bresenham's Line Algorithm (integer math)",
+                 COL_YELLOW, true);
 
         // Magnified grid (kept below the phase title, above the caption).
         float gx = 300, gy = 110, cell = 24;
@@ -221,9 +223,9 @@ void scene1(float t) {
         snprintf(buf, sizeof(buf), "pixel %d of %d", shown, (int)pts.size());
         drawText(gx + cols * cell + 12, gy + rows * cell - 20, buf, COL_YELLOW, false);
 
-        drawText(250, 70,
-                 "Only add, subtract and compare - no decimals - so it is very fast.",
-                 COL_WHITE, false);
+        drawText(180, 70,
+                 "Picks the nearest pixel with integer math - very fast.",
+                 COL_WHITE, true);
     }
 
     // ===========================================================
@@ -231,8 +233,9 @@ void scene1(float t) {
     // ===========================================================
     else if (t < T_POLY) {
         float ct = t - T_CIRCLE;
-        drawLabel(250, WIN_HEIGHT - 85,
-                  "3. CIRCLES  -  Midpoint Algorithm: compute 1/8, then mirror it 8 ways");
+        drawText(30, WIN_HEIGHT - 95,
+                 "3. CIRCLES  -  Midpoint Algorithm: compute 1/8, mirror 8 ways",
+                 COL_YELLOW, true);
 
         float gx = 330, gy = 110, cell = 20;
         int   R  = 8;
@@ -259,9 +262,9 @@ void scene1(float t) {
         drawText(gx + cols * cell + 12, gy + rows * cell - 38,
                  "8 mirrored", COL_SCENE1, false);
 
-        drawText(250, 70,
-                 "One computed pixel (yellow) lights 8 symmetric pixels around the centre.",
-                 COL_WHITE, false);
+        drawText(180, 70,
+                 "One pixel computed, eight mirrored around the centre.",
+                 COL_WHITE, true);
     }
 
     // ===========================================================
@@ -269,8 +272,9 @@ void scene1(float t) {
     // ===========================================================
     else {
         float pt = t - T_POLY;
-        drawLabel(250, WIN_HEIGHT - 85,
-                  "4. POLYGONS  -  connect vertices in order with GL_LINE_LOOP");
+        drawText(30, WIN_HEIGHT - 95,
+                 "4. POLYGONS  -  connect vertices in order (GL_LINE_LOOP)",
+                 COL_YELLOW, true);
 
         if (pt < 4000.0f) {                           // triangle
             setColor(COL_CYAN);
@@ -278,7 +282,7 @@ void scene1(float t) {
             glBegin(GL_LINE_LOOP);
                 glVertex2f(390, 180); glVertex2f(560, 180); glVertex2f(475, 340);
             glEnd();
-            drawText(250, 130, "Triangle - 3 vertices joined in a loop.", COL_WHITE, false);
+            drawText(180, 130, "Triangle - 3 vertices joined in a loop.", COL_WHITE, true);
         }
         else if (pt < 8000.0f) {                      // square
             setColor(COL_CYAN);
@@ -287,14 +291,14 @@ void scene1(float t) {
                 glVertex2f(395, 180); glVertex2f(555, 180);
                 glVertex2f(555, 340); glVertex2f(395, 340);
             glEnd();
-            drawText(250, 130, "Square - 4 vertices joined in a loop.", COL_WHITE, false);
+            drawText(180, 130, "Square - 4 vertices joined in a loop.", COL_WHITE, true);
         }
         else {                                        // house outline (stays)
             drawHouseOutline(475, 180, 85, COL_SCENE1, 3.0f);
-            drawText(250, 130,
-                     "A house = square body + triangle roof.", COL_WHITE, false);
-            drawText(250, 108,
-                     "Looks a little empty, doesn't it?", COL_YELLOW, false);
+            drawText(180, 130,
+                     "A house = square body + triangle roof.", COL_WHITE, true);
+            drawText(180, 105,
+                     "Looks a little empty, doesn't it?", COL_YELLOW, true);
         }
     }
 

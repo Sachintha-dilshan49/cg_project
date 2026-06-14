@@ -103,8 +103,9 @@ void scene3(float t) {
     //  1. TRANSLATION
     // ===========================================================
     if (t < T_ROT) {
-        drawLabel(280, WIN_HEIGHT - 95,
-                  "1. TRANSLATION  -  add (tx, ty) to every coordinate");
+        drawText(30, WIN_HEIGHT - 95,
+                 "1. TRANSLATION  -  add (tx, ty) to every coordinate",
+                 COL_YELLOW, true);
         float p = sin((t - T_TRANS) * 0.0012f);     // -1..1
         float tx = p * 130.0f, ty = p * 40.0f;
 
@@ -121,8 +122,9 @@ void scene3(float t) {
     //  2. ROTATION (about the house's pivot = home origin)
     // ===========================================================
     else if (t < T_SCALE) {
-        drawLabel(280, WIN_HEIGHT - 95,
-                  "2. ROTATION  -  spin about a pivot using sin & cos");
+        drawText(30, WIN_HEIGHT - 95,
+                 "2. ROTATION  -  spin about a pivot using sin & cos",
+                 COL_YELLOW, true);
         float ang = (t - T_ROT) * 0.035f;            // degrees
         float r   = ang * M_PI / 180.0f;
 
@@ -146,13 +148,15 @@ void scene3(float t) {
         if (lt < 4500.0f) {                          // uniform
             float k = 0.6f + 0.4f * (1 + sin(lt * 0.0016f));
             sx = sy = k;
-            drawLabel(280, WIN_HEIGHT - 95,
-                      "3. SCALING  -  uniform: multiply x and y equally");
+            drawText(30, WIN_HEIGHT - 95,
+                     "3. SCALING  -  uniform: multiply x and y equally",
+                     COL_YELLOW, true);
         } else {                                      // non-uniform
             sx = 0.6f + 0.6f * (1 + sin(lt * 0.0016f));
             sy = 0.8f;
-            drawLabel(280, WIN_HEIGHT - 95,
-                      "3. SCALING  -  non-uniform: stretch / squish");
+            drawText(30, WIN_HEIGHT - 95,
+                     "3. SCALING  -  non-uniform: stretch / squish",
+                     COL_YELLOW, true);
         }
         glPushMatrix();
             glTranslatef(BX, BY, 0);
@@ -174,7 +178,7 @@ void scene3(float t) {
             "4. REFLECTION  -  flip across the X-axis",
             "4. REFLECTION  -  flip across the Y-axis",
             "4. REFLECTION  -  flip across the line y = x" };
-        drawLabel(280, WIN_HEIGHT - 95, names[mode]);
+        drawText(30, WIN_HEIGHT - 95, names[mode], COL_YELLOW, true);
 
         // Draw the mirror axis (red) through the home origin.
         setColor(COL_SCENE4);
@@ -223,15 +227,17 @@ void scene3(float t) {
                 glMultMatrixf(shear);
                 float t0[9] = { 1,sh,0,  0,1,0,  0,0,1 };
                 for (int i = 0; i < 9; i++) m[i] = t0[i];
-                drawLabel(280, WIN_HEIGHT - 95,
-                          "5. SHEARING  -  horizontal: x' = x + sh*y (italics!)");
+                drawText(30, WIN_HEIGHT - 95,
+                         "5. SHEARING  -  horizontal: x' = x + sh*y (italics!)",
+                         COL_YELLOW, true);
             } else {                                  // vertical: y' = y + sh*x
                 float shear[16] = { 1,sh,0,0,  0,1,0,0,  0,0,1,0,  0,0,0,1 };
                 glMultMatrixf(shear);
                 float t0[9] = { 1,0,0,  sh,1,0,  0,0,1 };
                 for (int i = 0; i < 9; i++) m[i] = t0[i];
-                drawLabel(280, WIN_HEIGHT - 95,
-                          "5. SHEARING  -  vertical: y' = y + sh*x");
+                drawText(30, WIN_HEIGHT - 95,
+                         "5. SHEARING  -  vertical: y' = y + sh*x",
+                         COL_YELLOW, true);
             }
             drawHouseLocal(false);
         glPopMatrix();
@@ -244,8 +250,9 @@ void scene3(float t) {
     // ===========================================================
     else {
         float lt = t - T_COMBO;
-        drawLabel(280, WIN_HEIGHT - 95,
-                  "CHAINING  -  multiply matrices to combine all transforms");
+        drawText(30, WIN_HEIGHT - 95,
+                 "CHAINING  -  multiply matrices to combine all transforms",
+                 COL_YELLOW, true);
         float ang = lt * 0.03f;
         float k   = 0.7f + 0.25f * (1 + sin(lt * 0.0016f));
         float tx  = 90.0f * sin(lt * 0.0012f);
@@ -257,11 +264,12 @@ void scene3(float t) {
             drawHouseLocal(false);
         glPopMatrix();
 
-        drawText(600, 300, "M = T . R . S", COL_YELLOW, false);
-        drawText(560, 270, "Each transform is one matrix;", COL_WHITE, false);
-        drawText(560, 252, "chain them by multiplying.", COL_WHITE, false);
-        drawText(280, 120, "But what if the scene is bigger than the screen?",
-                 COL_YELLOW, false);
+        drawText(560, 320, "M = T . R . S", COL_YELLOW, true);
+        drawText(180, 120,
+                 "Each transform is a matrix - chain them by multiplying.",
+                 COL_WHITE, true);
+        drawText(180, 95, "But what if the scene is bigger than the screen?",
+                 COL_YELLOW, true);
     }
 
     if (t > T_COMBO + 3000.0f) {
