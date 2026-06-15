@@ -20,19 +20,6 @@
 
 ---
 
-## Rules everyone MUST follow
-
-1. **Only edit your own file.** Your file is `scenes/sceneX.cpp` where X is your number.
-2. **Never change `common.h`** without telling everyone first. It affects all 5 members.
-3. **Window size is 800 x 600.** Keep all your drawing within x: 0-800, y: 0-600.
-4. **Use the shared color palette** from `common.h`. Do not use random `glColor3f` values.
-5. **Use `drawText()` / `drawLabel()` / `drawHeading()`** for all text. No other fonts.
-6. **Use `animTime` (variable `t` in your function) for all animations.** Do not use
-   your own timer or `clock()`. This keeps all animations in sync.
-7. **Keep your helper functions `static`** inside your .cpp file so names don't clash.
-8. **Do not include other members' .cpp files.** Only include `common.h`.
-
----
 
 ## How to build and run
 
@@ -81,56 +68,12 @@ make run
 | `6` | Outro |
 | `ESC` | Quit |
 
----
 
-## How to implement your scene
 
-Open your `scenes/sceneX.cpp`. Your function signature is:
-
-```cpp
-void sceneX(float t) {
-    // t = milliseconds since this scene started
-}
-```
-
-Use `t` to animate over time:
-
-```cpp
-void scene3(float t) {
-    // Sub-scene A: first 5 seconds
-    if (t < 5000) {
-        float angle = t * 0.05f;   // grows over time
-        // draw rotation demo...
-    }
-    // Sub-scene B: 5 to 10 seconds
-    else if (t < 10000) {
-        // draw scaling demo...
-    }
-}
-```
-
-Draw Prof. Pixel anywhere in your scene:
-```cpp
-drawProfPixel(120, 120, 0.9f, false, 0.8f);
-//            x    y   scale  wave  mouthOpen
-```
-
-Draw text:
-```cpp
-drawHeading(20, 550, "My Scene Title");   // large white text
-drawLabel(200, 300, "angle = 45 deg");   // small yellow label
-```
 
 ---
 
-## Merging your work
 
-1. Each member works only in their own `scenes/sceneX.cpp`
-2. To merge: copy your `.cpp` file into the shared folder
-3. Member 1 runs `make` — if it compiles, the merge is done
-4. If there are errors, they will be in your file only (names clash, missing include, etc.)
-
----
 
 ## Concepts checklist
 
