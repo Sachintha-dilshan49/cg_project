@@ -14,18 +14,18 @@
 
 // ── Sub-scene timeline (milliseconds) ────────────────────────
 static const float T_TRANSFORM = 1000.0f;
-static const float T_PROJ      = 12000.0f;
-static const float T_ZBUF      = 24000.0f;
-static const float T_ANIM      = 36000.0f;
+static const float T_PROJ      = 31000.0f;   // concept 1: 1s  → 31s  (~30s)
+static const float T_ZBUF      = 61000.0f;   // concept 2: 31s → 61s  (~30s)
+static const float T_ANIM      = 91000.0f;   // concept 3: 61s → 91s  (~30s)
+                                              // concept 4: 91s → 120s (~29s)
 
 // ── Content area (right side, leaving left for Prof. Pixel) ──
-// Prof takes roughly x=0..220, so content starts at x=230
-static const float CX0 = 230.0f;   // content left edge
-static const float CX1 = 780.0f;   // content right edge
-static const float CY0 =  60.0f;   // content bottom edge
-static const float CY1 = 520.0f;   // content top edge
-static const float CCX = (CX0+CX1)*0.5f;  // content centre X
-static const float CCY = (CY0+CY1)*0.5f;  // content centre Y
+static const float CX0 = 230.0f;
+static const float CX1 = 780.0f;
+static const float CY0 =  60.0f;
+static const float CY1 = 520.0f;
+static const float CCX = (CX0+CX1)*0.5f;
+static const float CCY = (CY0+CY1)*0.5f;
 
 // ── 3D viewport sits inside the content area ─────────────────
 static const int V3X = (int)CX0;
@@ -40,7 +40,7 @@ static float s5_smoothstep(float t){
 }
 static float s5_clamp01(float t){ return t<0.f?0.f:t>1.f?1.f:t; }
 
-// ── 2D helpers (same style as scene4) ────────────────────────
+// ── 2D helpers ────────────────────────────────────────────────
 static void s5_solidLine(float x0,float y0,float x1,float y1,Color c,float lw){
     setColor(c);
     glLineWidth(lw);
@@ -66,13 +66,11 @@ static void s5_filledRect(float x0,float y0,float x1,float y1,Color c){
     glEnd();
 }
 static void s5_badge(float x,float y,float w,float h,Color border){
-    // dark fill
     glColor4f(0.04f,0.04f,0.10f,0.88f);
     glBegin(GL_QUADS);
     glVertex2f(x,y); glVertex2f(x+w,y);
     glVertex2f(x+w,y+h); glVertex2f(x,y+h);
     glEnd();
-    // border
     setColor(border);
     glLineWidth(2.f);
     glBegin(GL_LINE_LOOP);
@@ -381,7 +379,7 @@ void scene5(float t)
     // ── Heading ──────────────────────────────────────────────
     drawHeading(20, H-35, "3D Graphics and Animation");
 
-    // ── Prof. Pixel (left side, same as scene4) ───────────────
+    // ── Prof. Pixel (left side) ───────────────────────────────
     float wave = (t > 1200.0f) ? 0.0f : 1.0f;
     float talk = (fmodf(t, 1200.0f) < 600.0f) ? 0.8f : 0.0f;
     drawProfPixel(110, 110, 0.9f, wave > 0.5f, talk);
@@ -391,13 +389,16 @@ void scene5(float t)
     glMatrixMode(GL_MODELVIEW);  glPushMatrix();
 
     // =========================================================
-    //  1. 3D TRANSFORMATIONS   0 – T_PROJ
+    //  1. 3D TRANSFORMATIONS   0 – T_PROJ  (~30 seconds)
     // =========================================================
     if(t < T_PROJ)
     {
         float lt = t - T_TRANSFORM;
         if(lt < 0) lt = 0;
-        int   seg = (int)(lt / 3500.f) % 3;
+
+        // Cycle through all 3 axes, spending ~10s on each
+        // Each axis segment is 10000ms = 10s  (3 * 10000 = 30000ms total)
+        int   seg = (int)(lt / 10000.f) % 3;
         float a   = lt * 0.038f;
 
         // ── 3D panel ──────────────────────────────────────────
@@ -441,7 +442,13 @@ void scene5(float t)
         snprintf(abuf,sizeof(abuf),"angle = %.0f deg",fmodf(a,360.f));
         drawText(CX0+18, CY0+44, abuf, COL_LIGHT_GREY, false);
 
-        // Axis legend (top-left of 3D panel)
+        // Progress indicator: which axis are we on
+        char pbuf[48];
+        snprintf(pbuf, sizeof(pbuf), "Axis %d / 3  (%.0fs remaining)",
+                 seg+1, (T_PROJ - t) / 1000.f);
+        drawText(CX0+10, CY1-45, pbuf, COL_LIGHT_GREY, false);
+
+        // Axis legend
         drawText(CX0+10, CY1-20, "Axes:", COL_WHITE, false);
         drawText(CX0+55, CY1-20, "X", {1,.25f,.25f}, false);
         drawText(CX0+75, CY1-20, "Y", {.25f,1,.25f}, false);
@@ -454,7 +461,7 @@ void scene5(float t)
     }
 
     // =========================================================
-    //  2. PROJECTION   T_PROJ – T_ZBUF
+    //  2. PROJECTION   T_PROJ – T_ZBUF  (~30 seconds)
     // =========================================================
     else if(t < T_ZBUF)
     {
@@ -491,16 +498,21 @@ void scene5(float t)
         drawLabel(CX0+10, H-85,
             "2. PROJECTION  -  orthographic (left) vs perspective (right)");
 
-        // Divider between the two halves
+        // Divider
         float divX = CX0 + (CX1-CX0)*0.5f;
         s5_solidLine(divX, CY0+40, divX, CY1-10, COL_DARK_GREY, 2.f);
 
-        // Sub-labels inside each half
+        // Sub-labels
         s5_badge(CX0+10, CY1-52, 180, 26, COL_SCENE5);
         drawText(CX0+18, CY1-40, "ORTHOGRAPHIC", COL_SCENE5, false);
 
         s5_badge(divX+10, CY1-52, 168, 26, COL_SCENE5);
         drawText(divX+18, CY1-40, "PERSPECTIVE", COL_SCENE5, false);
+
+        // Time remaining
+        char pbuf[48];
+        snprintf(pbuf, sizeof(pbuf), "%.0fs remaining", (T_ZBUF - t) / 1000.f);
+        drawText(CX1-120, CY1-20, pbuf, COL_LIGHT_GREY, false);
 
         // Bottom explanation
         drawText(CX0+10, CY0+24,
@@ -512,19 +524,19 @@ void scene5(float t)
     }
 
     // =========================================================
-    //  3. Z-BUFFER   T_ZBUF – T_ANIM
+    //  3. Z-BUFFER   T_ZBUF – T_ANIM  (~30 seconds)
     // =========================================================
     else if(t < T_ANIM)
     {
         float lt = t - T_ZBUF;
         float a  = lt * 0.018f;
-        Color c1={0.30f,0.55f,1.00f};   // blue
-        Color c2={1.00f,0.48f,0.06f};   // orange
-        Color c3={0.22f,0.80f,0.30f};   // green
+        Color c1={0.30f,0.55f,1.00f};
+        Color c2={1.00f,0.48f,0.06f};
+        Color c3={0.22f,0.80f,0.30f};
 
         int halfW = V3W/2;
 
-        // LEFT – depth OFF (painter's order, wrong)
+        // LEFT – depth OFF (wrong)
         glDisable(GL_DEPTH_TEST);
         begin3D_vp(V3X, V3Y, halfW, V3H, true);
         glTranslatef(0,0,-7.5f);
@@ -566,6 +578,11 @@ void scene5(float t)
         s5_badge(divX+10, CY1-52, 180, 26, {grn[0],grn[1],grn[2]});
         drawText(divX+18, CY1-40, "Z-BUFFER ON", {grn[0],grn[1],grn[2]}, false);
 
+        // Time remaining
+        char pbuf[48];
+        snprintf(pbuf, sizeof(pbuf), "%.0fs remaining", (T_ANIM - t) / 1000.f);
+        drawText(CX1-120, CY1-20, pbuf, COL_LIGHT_GREY, false);
+
         drawText(CX0+10, CY0+24,
             "Left: draw order decides overlap (wrong).",
             {red[0],red[1],red[2]}, false);
@@ -575,7 +592,7 @@ void scene5(float t)
     }
 
     // =========================================================
-    //  4. ANIMATION   T_ANIM onward
+    //  4. ANIMATION   T_ANIM onward  (~29 seconds)
     // =========================================================
     else
     {
@@ -585,8 +602,8 @@ void scene5(float t)
         glClear(GL_DEPTH_BUFFER_BIT);
         begin3D_right(true);
 
-        // Orbiting camera
-        float camAngle = lt * 0.00025f;
+        // Orbiting camera — slower orbit to fill 29 seconds nicely
+        float camAngle = lt * 0.00020f;
         float camR     = 9.0f;
         gluLookAt(sinf(camAngle)*camR, 3.0f, cosf(camAngle)*camR,
                   0.0, 0.2, 0.0, 0,1,0);
@@ -601,6 +618,7 @@ void scene5(float t)
         s5_tree( 5.0f,-1.5f,0.65f);
 
         // House with animated door
+        // Door opens at 1s, takes 3s to fully open, then holds for rest of scene
         float door = 0.f;
         if(lt > 1000.f){
             float dp = s5_clamp01((lt-1000.f)/3000.f);
@@ -611,10 +629,10 @@ void scene5(float t)
         s5_house(door);
         glPopMatrix();
 
-        // Car driving along the road
-        float speed = 0.0018f;
-        float carX  = fmodf(lt*speed,14.f)-7.f;
-        float wSpin = lt*speed*200.f;
+        // Car driving along the road (loops continuously)
+        float speed  = 0.0018f;
+        float carX   = fmodf(lt*speed, 14.f) - 7.f;
+        float wSpin  = lt*speed*200.f;
         glPushMatrix();
         glTranslatef(carX,-0.72f,2.45f);
         glScalef(0.55f,0.55f,0.55f);
@@ -653,8 +671,8 @@ void scene5(float t)
         }
     }
 
-    // ── Prompt after scene settles ────────────────────────────
-    if(t > T_ANIM + 4000.f){
+    // ── Prompt after ~119 seconds ─────────────────────────────
+    if(t > T_ANIM + 28000.f){
         drawText(W/2-80, 45,
             "Press SPACE for next scene", COL_LIGHT_GREY, false);
     }
